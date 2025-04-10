@@ -1,0 +1,41 @@
+sudo apt install docker.io -y
+sudo docker pull nginx
+sudo apt install -y gnupg software-properties-common curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+sudo apt update
+sudo apt install -y terraform
+sudo nano instance.tf
+sudo usermod -aG docker ubuntu
+newgrp docker
+sudo apt update
+sudo nano instance.tf
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 2.25.0"
+    }
+  }
+}
+
+provider "docker" {}
+
+resource "docker_image" "nginx" {
+  name = "nginx:latest"
+}
+
+resource "docker_container" "nginx_container" {
+  name  = "nginx-server"
+  image = docker_image.nginx.latest
+  ports {
+    internal = 80
+    external = 8080
+  }
+}
+    terraform init
+    terraform plan
+    terraform apply
+    docker ps
+    terraform destroy
+    terraform state
